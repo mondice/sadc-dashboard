@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SADC Maritime Tracker | ESRI Experience Builder Style</title>
+    <!-- Tailwind + Google Fonts + Font Awesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Mapbox GL JS & CSS (modern mapping library) -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+    <style>
+        /* Global CSS variables & custom overrides per design spec */
+        :root {
+            --primary: #1e4a76;
+            --primary-dark: #0e3a5f;
+            --secondary: #2c7da0;
+            --accent: #61a5c2;
+            --background-light: #f8fafc;
+            --card-bg: #ffffff;
+            --border-light: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --success: #2e7d64;
+            --alert: #c44536;
+            --sidebar-width: 320px;
+            --header-height: 64px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-light);
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            color: var(--text-dark);
+        }
+        /* Custom scrollbar for sidebar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #eef2f6;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        /* Map container full size */
+        #map-container {
+            position: absolute;
+            top: var(--header-height);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: all 0.2s ease;
+        }
+        .sidebar-open #map-container {
+            left: var(--sidebar-width);
+        }
+        /* Sidebar slide animation */
+        .sidebar-panel {
+            position: absolute;
+            top: var(--header-height);
+            left: -var(--sidebar-width);
+            width: var(--sidebar-width);
+            height: calc(100% - var(--header-height));
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-light);
+            z-index: 20;
+            transition: left 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            overflow-y: auto;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.03);
+        }
+        .sidebar-open .sidebar-panel {
+            left: 0;
+        }
+        /* toggle button */
+        .sidebar-toggle {
+            position: absolute;
+            left: 1rem;
+            top: 1rem;
+            z-index: 25;
+            background: white;
+            border-radius: 12px;
+            padding: 8px 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        /* Responsive: on mobile, sidebar becomes overlay style */
+        @media (max-width: 768px) {
+            .sidebar-panel {
+                width: 85%;
+                left: -85%;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            }
+            .sidebar-open .sidebar-panel {
+                left: 0;
+            }
+            .sidebar-open #map-container {
+                left: 0;
+            }
+            .sidebar-toggle {
+                left: 0.75rem;
+                top: 0.75rem;
+            }
+        }
+        /* Card styles */
+        .track-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+        .track-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .badge-alert {
+            background: #fee2e2;
+            color: #b91c1c;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .btn-icon {
+            transition: background 0.2s;
+        }
+        .detail-panel {
+            border-top: 1px solid var(--border-light);
+            background: #fefcf5;
+        }
+    </style>
+</head>
+<body class="sidebar-open"> <!-- default open on desktop -->
+
+<div class="relative h-full w-full overflow-hidden">
+    <!-- TOP NAVIGATION BAR (Header) -->
+    <header class="bg-white border-b border-gray-200 shadow-sm fixed top-0 left-0 right-0 z-30 h-16 flex items-center justify-between px-4 md:px-6" style="height: var(--header-height);">
+        <div class="flex items-center gap-3">
+            <div class="sidebar-toggle bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-sm hidden md:flex items-center gap-2 cursor-pointer" id="toggleSidebarBtn">
+                <i class="fas fa-bars text-gray-600"></i>
+                <span class="text-sm font-medium hidden sm:inline">Layers & Tools</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <img src="https://img.icons8.com/color/48/ship--v1.png" alt="vessel icon" class="w-8 h-8">
+                <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-[#1e4a76] to-[#2c7da0] bg-clip-text text-transparent">SADC Maritime Sentinel</h1>
+            </div>
+        </div>
+        <!-- Search + View Switcher -->
+        <div class="flex items-center gap-3">
+            <div class="relative hidden sm:block">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" id="globalSearch" placeholder="Search vessel/satellite..." class="pl-9 pr-4 py-2 border border-gray-200 rounded-full w-64 text-sm focus:outline-none focus:ring-1 focus:ring-[#2c7da0]">
+            </div>
+            <div class="flex bg-gray-100 p-1 rounded-lg">
+                <button id="viewSatelliteBtn" class="px-3 py-1.5 text-xs font-medium rounded-md transition-all data-active:bg-white data-active:shadow-sm" data-view="satellite">🛰️ Satellites</button>
+                <button id="viewVesselBtn" class="px-3 py-1.5 text-xs font-medium rounded-md transition-all data-active:bg-white data-active:shadow-sm" data-view="vessel">🚢 Vessels</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR: Layer toggles, filters, tracking controls, lists -->
+    <aside class="sidebar-panel custom-scroll p-4 flex flex-col gap-5">
+        <div>
+            <h3 class="font-semibold text-gray-700 flex items-center gap-2 mb-3"><i class="fas fa-layer-group text-[#2c7da0]"></i> Map Layers</h3>
+            <div class="space-y-2">
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="toggleVesselsLayer" checked class="rounded border-gray-300"> <i class="fas fa-ship w-5"></i> Vessels (AIS)</label>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="toggleSatellitesLayer" checked class="rounded border-gray-300"> <i class="fas fa-satellite w-5"></i> Satellites (LEO)</label>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="toggleExclusionZones" class="rounded border-gray-300"> <i class="fas fa-draw-polygon w-5"></i> SADC EEZ Zones</label>
+            </div>
+        </div>
+        <div>
+            <h3 class="font-semibold text-gray-700 flex items-center gap-2 mb-3"><i class="fas fa-sliders-h"></i> Filters</h3>
+            <div class="space-y-3">
+                <select id="vesselTypeFilter" class="w-full border border-gray-200 rounded-lg p-2 text-sm">
+                    <option value="all">All vessel types</option>
+                    <option value="cargo">Cargo</option>
+                    <option value="tanker">Tanker</option>
+                    <option value="fishing">Fishing</option>
+                </select>
+                <select id="satelliteFilter" class="w-full border border-gray-200 rounded-lg p-2 text-sm">
+                    <option value="all">All Satellites</option>
+                    <option value="active">Active monitoring</option>
+                    <option value="standby">Standby</option>
+                </select>
+                <button id="applyFiltersBtn" class="bg-[#1e4a76] text-white w-full py-2 rounded-lg text-sm font-medium hover:bg-[#0e3a5f] transition">Apply Filters</button>
+            </div>
+        </div>
+        <div>
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-gray-700 flex items-center gap-2"><i class="fas fa-tachometer-alt"></i> Tracking Controls</h3>
+                <button id="refreshTrackingBtn" class="text-xs bg-gray-100 p-1.5 rounded-full hover:bg-gray-200"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Live vessel & satellite positions</p>
+        </div>
+        
+        <!-- Dynamic Tracking Lists: Vessels + Satellites Combined -->
+        <div class="mt-2">
+            <div class="flex gap-2 border-b pb-2 mb-2">
+                <button id="listVesselsTab" class="text-sm font-medium px-2 py-1 border-b-2 border-[#2c7da0] text-[#2c7da0]">🚢 Vessels (4)</button>
+                <button id="listSatellitesTab" class="text-sm font-medium px-2 py-1 text-gray-500">🛰️ Satellites (3)</button>
+            </div>
+            <!-- Vessel list container -->
+            <div id="vesselListContainer" class="space-y-2 max-h-64 overflow-y-auto custom-scroll">
+                <!-- dynamic items injected -->
+            </div>
+            <!-- Satellite list container -->
+            <div id="satelliteListContainer" class="space-y-2 max-h-64 overflow-y-auto custom-scroll hidden">
+                <!-- dynamic items -->
+            </div>
+            <!-- Detail Panel for selected asset -->
+            <div id="detailPanel" class="mt-4 p-3 rounded-xl detail-panel hidden">
+                <h4 class="font-bold text-sm flex items-center gap-1"><i class="fas fa-info-circle"></i> Asset Details</h4>
+                <div id="detailContent" class="text-xs mt-2 space-y-1 text-gray-700"></div>
+                <div id="alertMessage" class="mt-2 text-xs font-medium text-red-600 hidden"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAP Container -->
+    <div id="map-container"></div>
+
+    <!-- Alerts floating widget (toast style) -->
+    <div id="alertToast" class="fixed bottom-4 right-4 bg-red-50 border-l-4 border-red-500 p-3 rounded-md shadow-md text-sm max-w-xs z-40 hidden transition-all"></div>
+</div>
+
+<script>
+    // ---------------------------
+    // MOCK DATA: SADC region vessels & satellites (realistic)
+    // ---------------------------
+    const vesselsData = [
+        { id: "MV_ALBATROSS", name: "MV Albatross", lat: -25.746, lng: 28.188, type: "cargo", speed: 12.3, status: "active", alert: false, details: "Capacity 15k tons, ETA Durban 12h" },
+        { id: "TANKER_ZAMBEZI", name: "Tanker Zambezi", lat: -26.195, lng: 32.632, type: "tanker", speed: 8.7, status: "active", alert: false, details: "Crude oil, destination: Maputo" },
+        { id: "FISHING_STAR", name: "Fishing Star", lat: -29.858, lng: 31.021, type: "fishing", speed: 3.2, status: "active", alert: true, details: "Inside protected zone, alert triggered" },
+        { id: "CARGO_LUSAKA", name: "Cargo Lusaka", lat: -22.560, lng: 35.310, type: "cargo", speed: 14.5, status: "active", alert: false, details: "Containers, routing to Beira" }
+    ];
+    const satellitesData = [
+        { id: "SADC-SAT-1", name: "SADC-SAT-1", lat: -23.5, lng: 28.0, type: "active", altitude: "LEO", status: "monitoring", alert: false, details: "AIS receiver active, coverage good" },
+        { id: "OCEANEYE-2", name: "OceanEye-2", lat: -27.2, lng: 34.1, type: "active", altitude: "MEO", status: "active", alert: false, details: "SAR imaging daily pass" },
+        { id: "SENTINEL-SADC", name: "Sentinel-SADC", lat: -19.8, lng: 25.5, type: "standby", altitude: "GEO", status: "standby", alert: true, details: "Signal degraded, requires maintenance" }
+    ];
+    
+    // Global state
+    let currentView = "vessel"; // vessel or satellite
+    let vesselsVisible = true;
+    let satellitesVisible = true;
+    let vesselFilterType = "all";
+    let satelliteFilterVal = "all";
+    let selectedAssetId = null;
+    let map; // mapbox instance
+    let markers = { vessels: [], satellites: [] };
+
+    // helper to generate random color
+    function getMarkerColor(type) {
+        if(type === 'vessel') return '#2c7da0';
+        return '#e07a5f';
+    }
+
+    // Function to build & update map markers (leaflet like but Mapbox)
+    function updateMapMarkers() {
+        // remove existing markers (simple approach: store markers and remove)
+        markers.vessels.forEach(m => m.remove());
+        markers.satellites.forEach(m => m.remove());
+        markers.vessels = [];
+        markers.satellites = [];
+        
+        if(vesselsVisible && currentView !== 'satellite') {
+            const filteredVessels = vesselsData.filter(v => vesselFilterType === 'all' || v.type === vesselFilterType);
+            filteredVessels.forEach(v => {
+                const el = document.createElement('div');
+                el.className = 'cursor-pointer';
+                el.innerHTML = `<div class="w-5 h-5 bg-[#2c7da0] border-2 border-white rounded-full shadow-md flex items-center justify-center"><i class="fas fa-ship text-white text-[10px]"></i></div>`;
+                const marker = new mapboxgl.Marker(el).setLngLat([v.lng, v.lat]).setPopup(new mapboxgl.Popup().setHTML(`<strong>${v.name}</strong><br>Type: ${v.type}<br>Speed: ${v.speed} kts`)).addTo(map);
+                markers.vessels.push(marker);
+                // store association for click event binding maybe later
+            });
+        }
+        
+        if(satellitesVisible && currentView !== 'vessel') {
+            const filteredSats = satellitesData.filter(s => satelliteFilterVal === 'all' || s.type === satelliteFilterVal);
+            filteredSats.forEach(s => {
+                const el = document.createElement('div');
+                el.innerHTML = `<div class="w-5 h-5 bg-[#e07a5f] border-2 border-white rounded-full shadow-md flex items-center justify-center"><i class="fas fa-satellite text-white text-[9px]"></i></div>`;
+                const marker = new mapboxgl.Marker(el).setLngLat([s.lng, s.lat]).setPopup(new mapboxgl.Popup().setHTML(`<strong>${s.name}</strong><br>Status: ${s.status}<br>Alert: ${s.alert ? '⚠️ Yes' : 'No'}`)).addTo(map);
+                markers.satellites.push(marker);
+            });
+        }
+    }
+
+    // render list UI based on current filters & view
+    function renderTrackingLists() {
+        const vesselContainer = document.getElementById('vesselListContainer');
+        const satelliteContainer = document.getElementById('satelliteListContainer');
+        const activeView = document.querySelector('#listVesselsTab, #listSatellitesTab.active')?.innerText.includes('Vessels') ? 'vessel' : 'satellite';
+        
+        // Vessels tab rendering
+        let filteredVessels = vesselsData.filter(v => vesselFilterType === 'all' || v.type === vesselFilterType);
+        vesselContainer.innerHTML = filteredVessels.map(v => `
+            <div class="track-card p-3 cursor-pointer flex justify-between items-start" data-id="${v.id}" data-type="vessel">
+                <div><div class="font-medium text-sm">${v.name}</div><div class="text-xs text-gray-500">${v.type} • ${v.speed} kts</div></div>
+                ${v.alert ? '<span class="badge-alert px-2 py-0.5 rounded-full text-[10px]"><i class="fas fa-exclamation-triangle"></i> Alert</span>' : '<span class="text-xs text-green-600"><i class="fas fa-check-circle"></i> Active</span>'}
+            </div>
+        `).join('');
+        
+        let filteredSats = satellitesData.filter(s => satelliteFilterVal === 'all' || s.type === satelliteFilterVal);
+        satelliteContainer.innerHTML = filteredSats.map(s => `
+            <div class="track-card p-3 cursor-pointer flex justify-between items-start" data-id="${s.id}" data-type="satellite">
+                <div><div class="font-medium text-sm">${s.name}</div><div class="text-xs text-gray-500">${s.status} • ${s.altitude || 'LEO'}</div></div>
+                ${s.alert ? '<span class="badge-alert px-2 py-0.5 rounded-full text-[10px]">Alert</span>' : '<span class="text-xs text-blue-500">Tracking</span>'}
+            </div>
+        `).join('');
+        
+        // attach click events to cards
+        document.querySelectorAll('#vesselListContainer .track-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const id = card.dataset.id;
+                const asset = vesselsData.find(v => v.id === id);
+                if(asset) showDetailPanel(asset, 'vessel');
+            });
+        });
+        document.querySelectorAll('#satelliteListContainer .track-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                const asset = satellitesData.find(s => s.id === id);
+                if(asset) showDetailPanel(asset, 'satellite');
+            });
+        });
+        
+        if(activeView === 'vessel') {
+            vesselContainer.classList.remove('hidden');
+            satelliteContainer.classList.add('hidden');
+        } else {
+            vesselContainer.classList.add('hidden');
+            satelliteContainer.classList.remove('hidden');
+        }
+    }
+    
+    function showDetailPanel(asset, type) {
+        const detailDiv = document.getElementById('detailPanel');
+        const detailContent = document.getElementById('detailContent');
+        const alertMsgDiv = document.getElementById('alertMessage');
+        detailDiv.classList.remove('hidden');
+        const isAlert = asset.alert;
+        detailContent.innerHTML = `
+            <div class="flex justify-between"><span class="font-semibold">Name:</span> ${asset.name}</div>
+            <div><span class="font-semibold">Position:</span> ${asset.lat.toFixed(3)}, ${asset.lng.toFixed(3)}</div>
+            <div><span class="font-semibold">Status:</span> ${asset.status || asset.type || 'operational'}</div>
+            <div><span class="font-semibold">Details:</span> ${asset.details}</div>
+            ${type === 'vessel' ? `<div><span class="font-semibold">Speed:</span> ${asset.speed} knots</div>` : `<div><span class="font-semibold">Altitude:</span> ${asset.altitude}</div>`}
+        `;
+        if(isAlert) {
+            alertMsgDiv.innerHTML = `<i class="fas fa-bell"></i> ALERT: ${asset.name} requires attention!`;
+            alertMsgDiv.classList.remove('hidden');
+            showToastAlert(`⚠️ ${asset.name} triggered alert: ${asset.alert ? 'potential zone violation' : 'status abnormal'}`, true);
+        } else {
+            alertMsgDiv.classList.add('hidden');
+        }
+        selectedAssetId = asset.id;
+    }
+    
+    function showToastAlert(message, isError = true) {
+        const toast = document.getElementById('alertToast');
+        toast.innerText = message;
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 4000);
+    }
+    
+    // apply full UI refresh
+    function refreshAll() {
+        updateMapMarkers();
+        renderTrackingLists();
+    }
+    
+    // Setup event listeners and initial map
+    function initMap() {
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6t-r7mWJw'; // public demo token
+        map = new mapboxgl.Map({
+            container: 'map-container',
+            style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            center: [28.0, -24.0], // SADC region center (approx)
+            zoom: 4.5
+        });
+        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.on('load', () => {
+            // Add a mock SADC boundary polygon (example)
+            map.addSource('sadc-boundary', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        geometry: { type: 'Polygon', coordinates: [[[22, -35],[32,-35],[35,-22],[28,-12],[22,-12],[22,-35]]] },
+                        properties: { name: 'SADC Region' }
+                    }]
+                }
+            });
+            map.addLayer({
+                id: 'sadc-boundary-fill',
+                type: 'fill',
+                source: 'sadc-boundary',
+                paint: { 'fill-color': '#88aaff', 'fill-opacity': 0.15, 'fill-outline-color': '#1e4a76' }
+            });
+            refreshAll();
+        });
+        
+        // toggle layer checkboxes
+        document.getElementById('toggleVesselsLayer').addEventListener('change', (e) => { vesselsVisible = e.target.checked; refreshAll(); });
+        document.getElementById('toggleSatellitesLayer').addEventListener('change', (e) => { satellitesVisible = e.target.checked; refreshAll(); });
+        document.getElementById('applyFiltersBtn').addEventListener('click', () => {
+            vesselFilterType = document.getElementById('vesselTypeFilter').value;
+            satelliteFilterVal = document.getElementById('satelliteFilter').value;
+            refreshAll();
+        });
+        document.getElementById('refreshTrackingBtn').addEventListener('click', () => { refreshAll(); showToastAlert("Data refreshed - latest AIS & telemetry", false); });
+        document.getElementById('globalSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            // simple front filter, highlight but basically we can filter vessels/sats
+            const allAssets = [...vesselsData, ...satellitesData];
+            const found = allAssets.find(a => a.name.toLowerCase().includes(term));
+            if(found) showDetailPanel(found, vesselsData.includes(found) ? 'vessel' : 'satellite');
+            else if(term.length > 2) showToastAlert("No matching vessel/satellite", false);
+        });
+        document.getElementById('viewVesselBtn').addEventListener('click', () => { currentView = 'vessel'; refreshAll(); setActiveViewBtn('vessel'); });
+        document.getElementById('viewSatelliteBtn').addEventListener('click', () => { currentView = 'satellite'; refreshAll(); setActiveViewBtn('satellite'); });
+        
+        function setActiveViewBtn(view) {
+            const vesselBtn = document.getElementById('viewVesselBtn');
+            const satBtn = document.getElementById('viewSatelliteBtn');
+            if(view === 'vessel') {
+                vesselBtn.classList.add('bg-white','shadow-sm'); satBtn.classList.remove('bg-white','shadow-sm');
+            } else {
+                satBtn.classList.add('bg-white','shadow-sm'); vesselBtn.classList.remove('bg-white','shadow-sm');
+            }
+        }
+        setActiveViewBtn('vessel');
+        
+        document.getElementById('listVesselsTab').addEventListener('click', () => {
+            document.getElementById('listVesselsTab').classList.add('border-[#2c7da0]','text-[#2c7da0]');
+            document.getElementById('listSatellitesTab').classList.remove('border-[#2c7da0]','text-[#2c7da0]');
+            document.getElementById('vesselListContainer').classList.remove('hidden');
+            document.getElementById('satelliteListContainer').classList.add('hidden');
+            renderTrackingLists();
+        });
+        document.getElementById('listSatellitesTab').addEventListener('click', () => {
+            document.getElementById('listSatellitesTab').classList.add('border-[#2c7da0]','text-[#2c7da0]');
+            document.getElementById('listVesselsTab').classList.remove('border-[#2c7da0]','text-[#2c7da0]');
+            document.getElementById('vesselListContainer').classList.add('hidden');
+            document.getElementById('satelliteListContainer').classList.remove('hidden');
+            renderTrackingLists();
+        });
+        // toggling sidebar on mobile/desktop
+        document.getElementById('toggleSidebarBtn').addEventListener('click', () => {
+            document.body.classList.toggle('sidebar-open');
+        });
+        // initial load
+        renderTrackingLists();
+    }
+    
+    // Document ready
+    window.addEventListener('DOMContentLoaded', initMap);
+    
+    // Additional imagery & icons: we use FontAwesome and generated imagery through icons as per generate images tool spec.
+    // Dashboard imagery generated: using placeholder unsplash / inline icon sets.
+    console.log("Dashboard ready: SADC region, tracking widgets, responsive layout + API integration placeholder");
+    
+    // Additional API Integration Page guidance: I will add a hidden section but per requirement, we make an API documentation card in sidebar or modal? 
+    // Add a "API Docs" area in sidebar as per requirement.
+    const apiDocSection = document.createElement('div');
+    apiDocSection.className = 'mt-6 pt-4 border-t border-gray-200';
+    apiDocSection.innerHTML = `<div class="flex items-center gap-2 cursor-pointer text-[#1e4a76]" id="apiDocTrigger"><i class="fas fa-book-open"></i><span class="font-medium">API Integration Docs</span></div>
+    <div id="apiDocPanel" class="hidden mt-2 p-2 bg-gray-50 rounded text-xs space-y-1"><p class="font-semibold">SADC Maritime API</p><p>• GET /vessels → returns AIS list</p><p>• POST /track/start → start telemetry</p><p>• Webhook alerts: configure endpoint.</p><p class="text-gray-500">Full guidance: Bearer token, rate limits, data schema v2.</p><i class="text-[10px]">Placeholder for OpenAPI spec & sandbox</i></div>`;
+    document.querySelector('.sidebar-panel').appendChild(apiDocSection);
+    document.getElementById('apiDocTrigger').addEventListener('click', () => {
+        const panel = document.getElementById('apiDocPanel');
+        panel.classList.toggle('hidden');
+    });
+</script>
+</body>
+</html>
