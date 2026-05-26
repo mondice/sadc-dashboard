@@ -1,0 +1,102 @@
+{
+  "type": "FeatureCollection",
+  "name": "event_history_dummy",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-001",
+        "event_type": "AIS Signal Lost",
+        "severity": "Medium",
+        "status": "Investigating",
+        "asset": "MV Atlantic Trader",
+        "timestamp": "2026-05-26T10:15:00Z",
+        "description": "AIS transmission interrupted for 12 minutes."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [32.58, -25.97]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-002",
+        "event_type": "Unauthorized EEZ Entry",
+        "severity": "High",
+        "status": "Active",
+        "asset": "Unknown Fishing Vessel",
+        "timestamp": "2026-05-26T10:42:00Z",
+        "description": "Vessel entered restricted EEZ sector."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [41.20, -18.50]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-003",
+        "event_type": "Satellite Eclipse",
+        "severity": "Low",
+        "status": "Resolved",
+        "asset": "EOSSAT-1",
+        "timestamp": "2026-05-26T11:00:00Z",
+        "description": "Temporary communication interruption during eclipse."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [20.10, -34.80]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-004",
+        "event_type": "Radar Contact Detected",
+        "severity": "Medium",
+        "status": "Monitoring",
+        "asset": "Patrol Zone Alpha",
+        "timestamp": "2026-05-26T11:18:00Z",
+        "description": "Unidentified radar contact detected offshore."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [15.40, -29.20]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-005",
+        "event_type": "Weather Alert",
+        "severity": "High",
+        "status": "Active",
+        "asset": "South Atlantic Corridor",
+        "timestamp": "2026-05-26T11:33:00Z",
+        "description": "Severe storm conditions affecting maritime operations."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [12.90, -38.10]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "event_id": "EVT-006",
+        "event_type": "Patrol Deployment",
+        "severity": "Info",
+        "status": "Completed",
+        "asset": "SAAF Patrol Unit 7",
+        "timestamp": "2026-05-26T11:48:00Z",
+        "description": "Routine patrol mission successfully deployed."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [28.60, -33.10]
+      }
+    }
+  ]
+}
