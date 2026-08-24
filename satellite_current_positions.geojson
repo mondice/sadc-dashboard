@@ -1,0 +1,131 @@
+{
+  "type": "FeatureCollection",
+  "name": "Dummy Live Satellite Positions",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "SAT-001",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          14.2,
+          -29.8
+        ]
+      },
+      "properties": {
+        "satellite_id": "SAT-001",
+        "name": "Aquila-1",
+        "norad_id": "DUMMY-1001",
+        "status": "MOVING",
+        "timestamp_utc": "2026-08-24T12:40:00Z",
+        "longitude": 14.2,
+        "latitude": -29.8,
+        "altitude_km": 535,
+        "speed_km_s": 7.62,
+        "heading_deg": 72,
+        "direction": "ENE",
+        "path_id": "PATH-001"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SAT-002",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          11.6,
+          -16.2
+        ]
+      },
+      "properties": {
+        "satellite_id": "SAT-002",
+        "name": "Kestrel-2",
+        "norad_id": "DUMMY-1002",
+        "status": "MOVING",
+        "timestamp_utc": "2026-08-24T12:40:00Z",
+        "longitude": 11.6,
+        "latitude": -16.2,
+        "altitude_km": 610,
+        "speed_km_s": 7.54,
+        "heading_deg": 105,
+        "direction": "ESE",
+        "path_id": "PATH-002"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SAT-003",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.1,
+          -32.2
+        ]
+      },
+      "properties": {
+        "satellite_id": "SAT-003",
+        "name": "UbuntuSat-3",
+        "norad_id": "DUMMY-1003",
+        "status": "MOVING",
+        "timestamp_utc": "2026-08-24T12:40:00Z",
+        "longitude": 18.1,
+        "latitude": -32.2,
+        "altitude_km": 475,
+        "speed_km_s": 7.7,
+        "heading_deg": 38,
+        "direction": "NE",
+        "path_id": "PATH-003"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SAT-004",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.6,
+          -8.8
+        ]
+      },
+      "properties": {
+        "satellite_id": "SAT-004",
+        "name": "FalconEye-4",
+        "norad_id": "DUMMY-1004",
+        "status": "MOVING",
+        "timestamp_utc": "2026-08-24T12:40:00Z",
+        "longitude": 12.6,
+        "latitude": -8.8,
+        "altitude_km": 680,
+        "speed_km_s": 7.48,
+        "heading_deg": 132,
+        "direction": "SE",
+        "path_id": "PATH-004"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SAT-005",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          9.8,
+          -23.6
+        ]
+      },
+      "properties": {
+        "satellite_id": "SAT-005",
+        "name": "Horizon-5",
+        "norad_id": "DUMMY-1005",
+        "status": "MOVING",
+        "timestamp_utc": "2026-08-24T12:40:00Z",
+        "longitude": 9.8,
+        "latitude": -23.6,
+        "altitude_km": 560,
+        "speed_km_s": 7.58,
+        "heading_deg": 84,
+        "direction": "E",
+        "path_id": "PATH-005"
+      }
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "type": "FeatureCollection",
+  "name": "Dummy Satellite Prediction Paths",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "PATH-001",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            14.2,
+            -29.8
+          ],
+          [
+            17.5,
+            -28.2
+          ],
+          [
+            20.8,
+            -26.4
+          ],
+          [
+            24.2,
+            -24.3
+          ],
+          [
+            27.7,
+            -21.9
+          ],
+          [
+            31.2,
+            -19.1
+          ],
+          [
+            34.8,
+            -16.0
+          ]
+        ]
+      },
+      "properties": {
+        "path_id": "PATH-001",
+        "satellite_id": "SAT-001",
+        "name": "Aquila-1",
+        "status": "PREDICTED",
+        "prediction_start_utc": "2026-08-24T12:40:00Z",
+        "prediction_end_utc": "2026-08-24T12:52:00Z",
+        "interval_minutes": 2,
+        "speed_km_s": 7.62,
+        "heading_deg": 72,
+        "direction": "ENE",
+        "altitude_km": 535
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "PATH-002",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            11.6,
+            -16.2
+          ],
+          [
+            15.3,
+            -17.6
+          ],
+          [
+            19.1,
+            -19.2
+          ],
+          [
+            23.0,
+            -21.0
+          ],
+          [
+            27.0,
+            -22.9
+          ],
+          [
+            31.1,
+            -24.9
+          ],
+          [
+            35.3,
+            -27.0
+          ]
+        ]
+      },
+      "properties": {
+        "path_id": "PATH-002",
+        "satellite_id": "SAT-002",
+        "name": "Kestrel-2",
+        "status": "PREDICTED",
+        "prediction_start_utc": "2026-08-24T12:40:00Z",
+        "prediction_end_utc": "2026-08-24T12:52:00Z",
+        "interval_minutes": 2,
+        "speed_km_s": 7.54,
+        "heading_deg": 105,
+        "direction": "ESE",
+        "altitude_km": 610
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "PATH-003",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            18.1,
+            -32.2
+          ],
+          [
+            20.4,
+            -29.1
+          ],
+          [
+            22.9,
+            -25.8
+          ],
+          [
+            25.6,
+            -22.2
+          ],
+          [
+            28.5,
+            -18.3
+          ],
+          [
+            31.6,
+            -14.1
+          ],
+          [
+            34.9,
+            -9.6
+          ]
+        ]
+      },
+      "properties": {
+        "path_id": "PATH-003",
+        "satellite_id": "SAT-003",
+        "name": "UbuntuSat-3",
+        "status": "PREDICTED",
+        "prediction_start_utc": "2026-08-24T12:40:00Z",
+        "prediction_end_utc": "2026-08-24T12:52:00Z",
+        "interval_minutes": 2,
+        "speed_km_s": 7.7,
+        "heading_deg": 38,
+        "direction": "NE",
+        "altitude_km": 475
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "PATH-004",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            12.6,
+            -8.8
+          ],
+          [
+            15.4,
+            -11.8
+          ],
+          [
+            18.4,
+            -15.1
+          ],
+          [
+            21.7,
+            -18.6
+          ],
+          [
+            25.2,
+            -22.3
+          ],
+          [
+            28.9,
+            -26.2
+          ],
+          [
+            32.8,
+            -30.3
+          ]
+        ]
+      },
+      "properties": {
+        "path_id": "PATH-004",
+        "satellite_id": "SAT-004",
+        "name": "FalconEye-4",
+        "status": "PREDICTED",
+        "prediction_start_utc": "2026-08-24T12:40:00Z",
+        "prediction_end_utc": "2026-08-24T12:52:00Z",
+        "interval_minutes": 2,
+        "speed_km_s": 7.48,
+        "heading_deg": 132,
+        "direction": "SE",
+        "altitude_km": 680
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "PATH-005",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            9.8,
+            -23.6
+          ],
+          [
+            13.7,
+            -23.0
+          ],
+          [
+            17.7,
+            -22.2
+          ],
+          [
+            21.8,
+            -21.2
+          ],
+          [
+            26.0,
+            -20.0
+          ],
+          [
+            30.3,
+            -18.6
+          ],
+          [
+            34.7,
+            -17.0
+          ]
+        ]
+      },
+      "properties": {
+        "path_id": "PATH-005",
+        "satellite_id": "SAT-005",
+        "name": "Horizon-5",
+        "status": "PREDICTED",
+        "prediction_start_utc": "2026-08-24T12:40:00Z",
+        "prediction_end_utc": "2026-08-24T12:52:00Z",
+        "interval_minutes": 2,
+        "speed_km_s": 7.58,
+        "heading_deg": 84,
+        "direction": "E",
+        "altitude_km": 560
+      }
+    }
+  ]
+}
