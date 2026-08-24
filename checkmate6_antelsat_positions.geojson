@@ -1,0 +1,58 @@
+{
+  "type": "FeatureCollection",
+  "name": "CHECKMATE 6 and ANTELSAT Current Positions",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "SAT-56165",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          12.0,
+          -29.0
+        ]
+      },
+      "properties": {
+        "satellite_name": "CHECKMATE 6",
+        "norad_id": 56165,
+        "country": "United States",
+        "object_type": "PAYLOAD",
+        "object_type_code": 1,
+        "purpose": "",
+        "altitude_km": 939.9,
+        "timestamp": "2026-08-24T15:11:18.413081",
+        "status": "MOVING",
+        "speed_km_s": 7.41,
+        "heading_deg": 67,
+        "direction": "ENE",
+        "path_id": "PATH-56165"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "SAT-40034",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          8.0,
+          -13.0
+        ]
+      },
+      "properties": {
+        "satellite_name": "ANTELSAT",
+        "norad_id": 40034,
+        "country": "Uruguay",
+        "object_type": "PAYLOAD",
+        "object_type_code": 1,
+        "purpose": "Technology",
+        "altitude_km": 567.71,
+        "timestamp": "2026-08-24T15:11:18.413081",
+        "status": "MOVING",
+        "speed_km_s": 7.58,
+        "heading_deg": 121,
+        "direction": "ESE",
+        "path_id": "PATH-40034"
+      }
+    }
+  ]
+}
